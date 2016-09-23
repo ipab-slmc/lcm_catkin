@@ -13,33 +13,8 @@ set(_lcmtypes_py_files)
 set(_lcmtypes_java_files)
 set(libname "lcmtypes_${PROJECT_NAME}")
 set(_lcm_redirct_script ${CMAKE_CURRENT_LIST_DIR}/redirect.py)
-
-
-macro(lcmtypes_get_types msgvar)
-    # get a list of all LCM types
-    file(GLOB __tmplcmtypes "${CMAKE_CURRENT_SOURCE_DIR}/lcmtypes/*.lcm")
-    set(${msgvar} "")
-    foreach(_msg ${__tmplcmtypes})
-        # Try to filter out temporary and backup files
-        if(${_msg} MATCHES "^[^\\.].*\\.lcm$")
-            list(APPEND ${msgvar} ${_msg})
-        endif(${_msg} MATCHES "^[^\\.].*\\.lcm$")
-    endforeach(_msg)
-endmacro()
-
-macro(lcmtypes_get_targets ret outdir ext msgvar)
-    foreach(_msg ${msgvar})
-        get_filename_component(_tmp_name ${_msg} NAME_WE)
-        list(APPEND ${ret} "${outdir}/${_tmp_name}.${ext}")
-    endforeach(_msg)
-endmacro()
-
-function(lcmgen)
-    execute_process(COMMAND ${LCM_GEN_EXECUTABLE} ${ARGV} RESULT_VARIABLE lcmgen_result)
-    if(NOT lcmgen_result EQUAL 0)
-        message(FATAL_ERROR "lcm-gen failed")
-    endif()
-endfunction()
+add_custom_target(lcmtypes_${PROJECT_NAME}_all ALL)
+list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS "lcmtypes_${PROJECT_NAME}_all")
 
 macro(AddLCM)
   set(_lcmtypes_python_dir ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION})
@@ -67,12 +42,20 @@ macro(GetLCMPackageName ret name)
   endif()
 endmacro(GetLCMPackageName)
 
+macro(GetLCMPackageNameSelf ret name)
+  if(${name} MATCHES "_lcmtypes")
+    string(REPLACE "_lcmtypes" "" ${ret} ${name})
+  else()
+    set(ret ${name})
+  endif()
+endmacro(GetLCMPackageNameSelf)
+
 macro(GetPackages ret)
   set(${ret} "")
-  GetLCMPackageName(tmp ${PROJECT_NAME})
+  GetLCMPackageNameSelf(tmp ${PROJECT_NAME})
   list_append_unique(${ret} ${tmp})
   foreach(depend_name ${catkin_ALL_FOUND_COMPONENTS})
-    GetLCMPackageName(tmp ${depend_name})
+    GetLCMPackageNameSelf(tmp ${depend_name})
     list_append_unique(${ret} ${tmp})
   endforeach()
 endmacro(GetPackages)
@@ -120,7 +103,7 @@ function(lcmtypes_build_c)
 
     add_custom_target(${PROJECT_NAME}_lcmgen_c ALL DEPENDS ${_lcmtypes} ${_lcmtypes_h_files} ${__agg_h_fname})
     add_library(${libname} ${_lcmtypes_c_files})
-    add_dependencies(${libname} ${PROJECT_NAME}_lcmgen_c)
+    add_dependencies(lcmtypes_${PROJECT_NAME} ${PROJECT_NAME}_lcmgen_c ${catkin_EXPORTED_TARGETS})
 
     unset(__sanitized_project_name)
     unset(__agg_h_fname)
@@ -160,8 +143,6 @@ function(lcmtypes_build_cpp)
       COMMAND sh -c '${_lcm_redirct_script} ${_num_lcmtypes} ${_lcmtypes_hpp_files} ${_lcm_packages}'
       DEPENDS ${_lcmtypes}
     )
-
-    add_dependencies(${libname} ${PROJECT_NAME}_lcmgen_cpp)
     include_directories(${CATKIN_DEVEL_PREFIX}/include)
 
     unset(__sanitized_project_name)
@@ -188,7 +169,6 @@ function(lcmtypes_build_python)
 endfunction()
 
 function(lcmtypes_build_java)
-    lcmtypes_get_types(_lcmtypes)
     list(LENGTH _lcmtypes _num_lcmtypes)
     if(_num_lcmtypes EQUAL 0)
         return()
@@ -221,8 +201,12 @@ function(lcmtypes_build_java)
 
     # search for lcmtypes_*.jar files in well-known places and add them to the
     # classpath
-    foreach(pfx ${_lcm_packages})
-        set(java_classpath ${java_classpath}:${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/lcmtypes_${pfx}_lcmtypes.jar)
+    set(_java_deps)
+    foreach(pfx ${catkin_ALL_FOUND_COMPONENTS})
+        if(";${${pfx}_EXPORTED_TARGETS};" MATCHES ";lcmtypes_${pfx}_all;")
+            set(java_classpath ${java_classpath}:${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/lcmtypes_${pfx}.jar)
+            list_append_unique(_java_deps lcmtypes_${pfx}_all)
+        endif()
     endforeach()
 
     # convert the list of .java filenames to a list of .class filenames
@@ -249,7 +233,8 @@ function(lcmtypes_build_java)
         VERBATIM)
     add_custom_target(lcmtypes_${PROJECT_NAME}_jar ALL DEPENDS ${LCMTYPES_JAR})
 
-    add_dependencies(lcmtypes_${PROJECT_NAME}_jar ${PROJECT_NAME}_lcmgen_java)
+    add_dependencies(lcmtypes_${PROJECT_NAME}_jar ${PROJECT_NAME}_lcmgen_java ${_java_deps} ${catkin_EXPORTED_TARGETS})
+    add_dependencies(lcmtypes_${PROJECT_NAME}_all lcmtypes_${PROJECT_NAME}_jar)
 
 endfunction()
 

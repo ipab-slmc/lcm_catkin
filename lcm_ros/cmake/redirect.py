@@ -12,8 +12,8 @@ if __name__ == "__main__":
                 s=fi.read()
             for package in sys.argv[n+1:]:
                 s=re.sub('import '+package+'.','import '+package+'_lcmtypes.',s)
-                s=re.sub('include "'+package+'/','include "'+package+'_lcmtypes/'+package+'_',s)
                 s=re.sub('include "'+package+'_','include "'+package+'_lcmtypes/'+package+'_',s)
+                s=re.sub('include "'+package+'/','include "'+package+'_lcmtypes/',s)
             with open(file_name,"w") as fo:
                 fo.write(s)
     else:
