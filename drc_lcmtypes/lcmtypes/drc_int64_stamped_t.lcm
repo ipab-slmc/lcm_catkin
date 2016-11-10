@@ -1,7 +1,0 @@
-package drc;
-
-struct int64_stamped_t
-{
-   int64_t utime;
-   int64_t data;
-}
