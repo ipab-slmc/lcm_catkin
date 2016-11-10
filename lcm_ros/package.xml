@@ -8,8 +8,7 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
-  <depend>lcm</depend>
-  <depend>Java</depend>
+  <depend>oh-distro</depend>
+  <depend>oh-distro-lcm</depend>
+  <depend>java</depend>
 </package>
