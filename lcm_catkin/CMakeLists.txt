@@ -1,19 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lcm_ros)
+project(lcm_catkin)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package(catkin REQUIRED COMPONENTS oh-distro
+find_package(catkin REQUIRED
 )
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LCM REQUIRED lcm>=1.3.0)
+pkg_check_modules(LCM REQUIRED lcm>=1.3.1)
 find_package(Java)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 catkin_package(
-  CATKIN_DEPENDS
-  DEPENDS oh-distro LCM Java 
+  DEPENDS LCM Java 
   CFG_EXTRAS lcmtypes.cmake
 )
 
