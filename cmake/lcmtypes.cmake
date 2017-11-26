@@ -435,10 +435,10 @@ macro(GenerateLCM)
 
     lcmtypes_build_c(${AGG_NAME})
     lcmtypes_build_cpp(${AGG_NAME})
-    lcmtypes_build_java(${ARGV})
-    lcmtypes_build_java_plugins()
+    #lcmtypes_build_java(${ARGV})
+    #lcmtypes_build_java_plugins()
     lcmtypes_build_python()
-    build_java_genric()
+    #build_java_genric()
 
     install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
