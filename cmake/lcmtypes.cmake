@@ -152,13 +152,16 @@ function(lcmtypes_build_cpp AGG_NAME)
 
 
     # generate C++ bindings for LCM types
-    add_custom_target(${PROJECT_NAME}_lcmgen_cpp ALL DEPENDS ${_lcmtypes} ${__agg_hpp_fname})
+    set(_lcmtypes_cpp_dir ${PROJECT_BINARY_DIR}/lcmtypes/cpp)
     add_custom_command(
-      TARGET ${PROJECT_NAME}_lcmgen_cpp
+      OUTPUT ${_lcmtypes_cpp_files} ${_lcmtypes_hpp_files}
       COMMAND sh -c '([ -d ${_lcmtypes_h_dir} ] || mkdir -p ${_lcmtypes_h_dir}) && ${LCM_GEN_EXECUTABLE} --cpp --cpp-hpath ${_lcmtypes_cpp_dir} --cpp-include lcmtypes ${_lcmtypes}'
       COMMAND sh -c '([ -d ${_lcmtypes_h_dir}/${_lcm_package_name} ] || mkdir -p ${_lcmtypes_h_dir}/${_lcm_package_name}) && cp ${_lcmtypes_cpp_dir}/${_lcm_package_name}/* ${_lcmtypes_h_dir}/${_lcm_package_name}'
       DEPENDS ${_lcmtypes}
+      COMMENT "Generating LCM types (native cpp)"
     )
+
+    add_custom_target(${PROJECT_NAME}_lcmgen_cpp ALL DEPENDS ${_lcmtypes} ${__agg_hpp_fname})
 
     unset(__sanitized_project_name)
     unset(__agg_hpp_fname)
