@@ -108,7 +108,7 @@ function(lcmtypes_build_c AGG_NAME)
     list(APPEND _lcmtypes_h_files ${__agg_h_fname})
 
     # generate C bindings for LCM types
-
+    set(_lcmtypes_c_dir ${PROJECT_BINARY_DIR}/lcmtypes/c)
     add_custom_command(
       OUTPUT ${_lcmtypes_c_files} ${_lcmtypes_h_files}
       COMMAND sh -c '([ -d ${_lcmtypes_h_dir} ] || mkdir -p ${_lcmtypes_h_dir}) '
@@ -148,6 +148,8 @@ function(lcmtypes_build_cpp AGG_NAME)
         unset(__tmp_header_fname)
     endforeach()
     file(APPEND ${__agg_hpp_fname} "\n#endif\n")
+    list(APPEND _lcmtypes_hpp_files ${__agg_hpp_fname})
+
 
     # generate C++ bindings for LCM types
     add_custom_target(${PROJECT_NAME}_lcmgen_cpp ALL DEPENDS ${_lcmtypes} ${__agg_hpp_fname})
