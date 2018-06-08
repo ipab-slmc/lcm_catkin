@@ -89,7 +89,6 @@ function(lcmtypes_build_c AGG_NAME)
         return()
     endif()
 
-    MATH(EXPR _num_lcmtypes2 "${_num_lcmtypes}*2")
     GetPackages(_lcm_packages)
 
     # header file that includes all other generated header files
