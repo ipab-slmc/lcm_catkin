@@ -12,7 +12,7 @@ find_package(Java)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 catkin_package(
-  DEPENDS LCM Java 
+  DEPENDS LCM
   CFG_EXTRAS lcmtypes.cmake
 )
 
