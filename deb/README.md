@@ -3,7 +3,7 @@ Just run ```./lcm_deb.bash```.
 This will download, compile and package LCM in the current directory. Remember not to commit generated files if you run the file within the source directory!
 
 This debian package is hosted on terminator.robots.inf.ed.ac.uk/apt. Run this command to add it to your sources:
-```echo deb http://terminator.robots.inf.ed.ac.uk/apt/ ./ | sudo tee -a /etc/apt/sources.list```
+```sudo sh -c 'echo "deb http://terminator.robots.inf.ed.ac.uk/apt/ ./" >> /etc/apt/sources.list.d/terminator.list'```
 
 Then to install run:
 ```sudo apt-get install liblcm```
